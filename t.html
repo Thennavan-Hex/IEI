@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Blur/Unblur Image</title>
+  <style>
+    .image-container {
+      width: 400px;
+      height: 300px; 
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(10px); 
+      transition: filter 0.3s ease-in-out;
+    }
+    .accept-cookie-button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1>Blur/Unblur Image</h1>
+    <div class="image-container">
+      <img id="my-image" src="bg.jpeg" alt="Blurred Image">
+    </div>
+    <button id="accept-cookie-button" class="btn btn-primary accept-cookie-button">Accept Cookie</button>
+  </div>
+
+  <script>
+    var button = document.getElementById('accept-cookie-button');
+    var image = document.getElementById('my-image');
+    var startTime = Date.now();
+
+    button.addEventListener('click', function() {
+      displayBrowserData();
+    });
+
+    function displayBrowserData() {
+      var browserData = {
+        UserAgent: navigator.userAgent,
+        Language: navigator.language,
+        Platform: navigator.platform,
+        CookiesEnabled: navigator.cookieEnabled,
+        IP: "",
+        CurrentTime: new Date().toLocaleString(),
+        ScreenResolution: window.innerWidth + "x" + window.innerHeight,
+        ReferringURL: document.referrer,
+        UsageTime: calculateUsageTime()
+      };
+
+      fetch("https://api.ipify.org/?format=json")
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          browserData.IP = data.ip;
+          displayData(browserData);
+        })
+        .catch(function(error) {
+          console.log("Error retrieving IP: " + error);
+          displayData(browserData);
+        });
+      image.style.filter = 'blur(0)';
+      button.textContent = 'Blur Image';
+      button.disabled = true;
+    }
+
+    function displayData(data) {
+      var dataDisplay = document.createElement("div");
+      dataDisplay.classList.add("mt-4");
+      dataDisplay.innerHTML = "";
+      for (var key in data) {
+        dataDisplay.innerHTML += "<strong>" + key + ":</strong> " + data[key] + "<br>";
+      }
+      document.body.appendChild(dataDisplay);
+    }
+
+    function calculateUsageTime() {
+      var currentTime = Date.now();
+      var elapsedTime = (currentTime - startTime) / 1000;
+      return elapsedTime.toFixed(2);
+    }
+  </script>
+</body>
+</html>
